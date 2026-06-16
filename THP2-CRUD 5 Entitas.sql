@@ -15,6 +15,16 @@ ALTER TABLE Tagihan
 ADD CONSTRAINT chk_diskon
 CHECK (diskon >= 0);
 
+-- [VALIDASI TAGIHAN] Memastikan harga satuan di detail tagihan bernilai positif
+ALTER TABLE Detail_Tagihan
+ADD CONSTRAINT chk_harga_satuan
+CHECK (harga_satuan >= 0);
+
+-- [VALIDASI OBAT] Mencegah string kosong pada kolom master obat
+ALTER TABLE Obat
+ADD CONSTRAINT chk_sediaan_obat
+CHECK (bentuk_sediaan <> '' AND satuan <> '');
+
 -- Menolak data suhu tubuh yang tidak masuk akal
 DELIMITER $$
 
@@ -111,7 +121,7 @@ DELETE FROM Rekam_Medis
 WHERE record_id = 2;
 
 
--- CRUD TABEL	
+-- CRUD TABEL TAGIHAN
 -- Menambahkan tagihan baru untuk kunjungan pasien
 INSERT INTO Tagihan
 (tanggal_tagihan, diskon, metode_pembayaran, status, visit_id)
