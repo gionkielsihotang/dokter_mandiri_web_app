@@ -182,15 +182,52 @@ END $$
 DELIMITER ;
 
 -- BAGIAN TESTING
+-- SKENARIO PENGUJIAN DUA ARAH (POSITIVE & NEGATIVE TESTING)
 
--- 1. Test Trigger 1 (Auto RM)
-INSERT INTO Pasien (nama, tgl_lahir) VALUES ('Budi Trigger', '1995-10-10');
+-- trg_generate_rm_pasien 1 Positif
+-- Memasukkan data pasien baru dengan semua kolom wajib terpenuhi
+INSERT INTO Pasien (nama, tgl_lahir, nik, jenis_kelamin) 
+VALUES ('Dedi Setiawan', '1990-05-17', '3515011705900003', 'L');
+
+-- Cek Hasil
 SELECT patient_id, nama, nomor_rm FROM Pasien ORDER BY patient_id DESC LIMIT 1;
 
--- 2. Test Trigger 4 (Audit Trail Logging)
-UPDATE Rekam_Medis SET catatan_klinis = 'Tipes (Revisi Diagnosa oleh Dokter Budi)' WHERE record_id = 1;
-SELECT * FROM Log_Audit_Sistem;
+-- trg_generate_rm_pasien Negatif
+-- Memasukkan data pasien yang sama lagi (Bentrokan Unique Key pada NIK)
+INSERT INTO Pasien (nama, tgl_lahir, nik, jenis_kelamin) 
+VALUES ('Dedi Duplikat', '1990-05-17', '3515011705900003', 'L');
 
--- 3. Test Trigger 5 & 6 (Dispensing & Stok Negatif)
-CALL sp_tambah_detail_resep(1, 1, 5);
-SELECT * FROM Transaksi_Stok ORDER BY tanggal DESC LIMIT 3;
+-- trg_validasi_jadwal_dokter Positif
+-- Mendaftarkan pasien ke Dokter A di jam 09:00 pada hari baru yang masih kosong
+INSERT INTO Kunjungan (doctor_id, patient_id, waktu_datang, status) 
+VALUES (1, 1, '2026-06-20 09:00:00', 'Menunggu');
+
+-- trg_validasi_jadwal_dokter Negatif
+-- Mendaftarkan pasien LAIN ke Dokter yang SAMA, di HARI dan JAM yang SAMA persis
+INSERT INTO Kunjungan (doctor_id, patient_id, waktu_datang, status) 
+VALUES (1, 2, '2026-06-20 09:00:00', 'Menunggu');
+
+-- trg_audit_rekam_medis Positif
+-- Mengubah catatan klinis yang memicu trigger audit
+UPDATE Rekam_Medis SET catatan_klinis = 'Hipertensi Grade II' WHERE record_id = 1;
+
+-- Cek tabel log
+SELECT * FROM Log_Audit_Sistem ORDER BY log_id DESC LIMIT 1;
+
+-- trg_audit_rekam_medis Negatif
+-- Mengupdate rekam medis tapi kolom 'catatan_klinis' TIDAK diubah (mengubah kolom lain seperti alergi)
+UPDATE Rekam_Medis SET alergi_obat = 'Amoxicillin' WHERE record_id = 1;
+
+-- Cek tabel log apakah ada log baru masuk
+SELECT * FROM Log_Audit_Sistem ORDER BY log_id DESC LIMIT 1;
+
+-- trg_auto_kurangi_stok_resep & trg_validasi_stok_negatif Positif
+-- Menginput resep dengan jumlah wajar yang tersedia di gudang (Misal minta 2 butir)
+CALL sp_tambah_detail_resep(1, 1, 2);
+
+-- Cek mutasi stok fisik
+SELECT * FROM Transaksi_Stok ORDER BY transaksi_id DESC LIMIT 1;
+
+-- trg_auto_kurangi_stok_resep & trg_validasi_stok_negatif Negatif
+-- Menginput resep dengan jumlah ekstrem yang melebihi kapasitas stok fisik (Misal minta 9999 butir)
+CALL sp_tambah_detail_resep(1, 1, 9999);
