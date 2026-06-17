@@ -1,12 +1,11 @@
 USE praktik_mandiri;
 
--- 0. PERSIAPAN STRUKTUR (Jalankan Sekali Saja)
+-- 0. PERSIAPAN STRUKTUR
 
--- Menggunakan ALTER TABLE karena ini adalah best practice untuk relasi 1:1
--- (Abaikan jika akan muncul warning error kolom sudah ada saat di-run ulang)
+-- Menambahkan kolom nomor_rm jika belum ada
 ALTER TABLE Pasien ADD COLUMN IF NOT EXISTS nomor_rm VARCHAR(30);
 
--- Membuat Tabel Audit Logging (Sesuai rubrik Audit Trail 15%)
+-- Membuat Tabel Audit Logging
 CREATE TABLE IF NOT EXISTS Log_Audit_Sistem (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     nama_tabel VARCHAR(50),
@@ -16,17 +15,15 @@ CREATE TABLE IF NOT EXISTS Log_Audit_Sistem (
     pengguna VARCHAR(50)
 );
 
--- TRIGGER 1: Auto-generate Nomor Rekam Medis (Auto-Update)
--- Skenario: Otomatis mengisi kolom nomor_rm saat pendaftaran pasien baru
+-- 1. TRIGGER: Auto-generate Nomor Rekam Medis Pasien Baru
 DELIMITER $$
-
 CREATE TRIGGER trg_generate_rm_pasien
 BEFORE INSERT ON Pasien
 FOR EACH ROW
 BEGIN
     DECLARE v_next_id INT;
     
-    -- Mencari ID selanjutnya untuk ditaruh di nomor RM
+    -- Mencari ID selanjutnya untuk format RM
     SELECT IFNULL(MAX(patient_id), 0) + 1 INTO v_next_id FROM Pasien;
     
     -- Format: RM-TahunBulan-ID (Misal: RM-202606-0001)
@@ -34,15 +31,13 @@ BEGIN
 END $$
 DELIMITER ;
 
--- TRIGGER 2: Update Total Tagihan (Maintenance Denormalized)
--- Skenario: Update kolom total_biaya di Tagihan setiap ada Detail baru
+-- 2. TRIGGER: Sinkronisasi Total Tagihan (INSERT, UPDATE, DELETE)
+-- Kondisi Update Insert
 DELIMITER $$
-
 CREATE TRIGGER trg_update_tagihan_insert
 AFTER INSERT ON Detail_Tagihan
 FOR EACH ROW
 BEGIN
-    -- Menghitung ulang total dari Detail_Tagihan ke tabel induk Tagihan
     UPDATE Tagihan
     SET total_biaya = (
         SELECT IFNULL(SUM(harga_satuan), 0) 
@@ -53,10 +48,40 @@ BEGIN
 END $$
 DELIMITER ;
 
--- TRIGGER 3: Validasi Jadwal Dokter (Business Rules & Validasi Data)
--- Skenario: Mencegah dokter di-booking di tanggal dan jam yang sama persis
+-- Kondisi Update Update
 DELIMITER $$
+CREATE TRIGGER trg_update_tagihan_update
+AFTER UPDATE ON Detail_Tagihan
+FOR EACH ROW
+BEGIN
+    UPDATE Tagihan
+    SET total_biaya = (
+        SELECT IFNULL(SUM(harga_satuan), 0) 
+        FROM Detail_Tagihan 
+        WHERE tagihan_id = NEW.tagihan_id
+    )
+    WHERE tagihan_id = NEW.tagihan_id;
+END $$
+DELIMITER ;
 
+-- Kondisi Update Deelete
+DELIMITER $$
+CREATE TRIGGER trg_update_tagihan_delete
+AFTER DELETE ON Detail_Tagihan
+FOR EACH ROW
+BEGIN
+    UPDATE Tagihan
+    SET total_biaya = (
+        SELECT IFNULL(SUM(harga_satuan), 0) 
+        FROM Detail_Tagihan 
+        WHERE tagihan_id = OLD.tagihan_id
+    )
+    WHERE tagihan_id = OLD.tagihan_id;
+END $$
+DELIMITER ;
+
+-- 3. TRIGGER: Validasi Jadwal Dokter (Mencegah Overlap)
+DELIMITER $$
 CREATE TRIGGER trg_validasi_jadwal_dokter
 BEFORE INSERT ON Kunjungan
 FOR EACH ROW
@@ -78,10 +103,8 @@ BEGIN
 END $$
 DELIMITER ;
 
--- TRIGGER 4: Log Perubahan Data Sensitif (Audit Trail Logging)
--- Skenario: Mencatat ke log jika dokter merevisi isi catatan rekam medis
+-- 4. TRIGGER: Audit Trail Logging Rekam Medis
 DELIMITER $$
-
 CREATE TRIGGER trg_audit_rekam_medis
 AFTER UPDATE ON Rekam_Medis
 FOR EACH ROW
@@ -100,40 +123,42 @@ BEGIN
 END $$
 DELIMITER ;
 
--- TRIGGER 5: Auto-Update Stok Setelah Dispensing Resep (Auto-Update)
--- Skenario: Saat detail resep masuk, otomatis mencatat stok keluar
+-- 5. TRIGGER: Auto-Update Stok Setelah Resep Masuk (Metode FEFO)
 DELIMITER $$
-
 CREATE TRIGGER trg_auto_kurangi_stok_resep
 AFTER INSERT ON Detail_Resep
 FOR EACH ROW
 BEGIN
-    -- Diasumsikan mengambil dari batch_id 1 dan lokasi_id 1 sebagai gudang default farmasi
-    INSERT INTO Transaksi_Stok (
-        tanggal, 
-        jenis_transaksi, 
-        jumlah, 
-        referensi, 
-        keterangan,
-        batch_id, 
-        lokasi_id
-    )
-    VALUES (
-        NOW(), 
-        'Stok Keluar', 
-        -NEW.jumlah, -- Dibikin minus agar memotong stok
-        CONCAT('RESEP-', NEW.resep_id), 
-        'Pemotongan otomatis via Resep Pasien',
-        1, 
-        1
-    );
+    DECLARE v_batch_id INT;
+    DECLARE v_lokasi_id INT DEFAULT 1; -- Default lokasi gudang farmasi
+    
+    -- Mencari batch dengan expiry date terdekat yang stoknya mencukupi
+    SELECT b.batch_id INTO v_batch_id
+    FROM Batch b
+    JOIN Transaksi_Stok ts ON b.batch_id = ts.batch_id
+    WHERE b.obat_id = NEW.obat_id
+    GROUP BY b.batch_id, b.expiry_date
+    HAVING SUM(ts.jumlah) >= NEW.jumlah
+    ORDER BY b.expiry_date ASC
+    LIMIT 1;
+
+    -- Memotong stok jika batch ditemukan, jika tidak tolak transaksi
+    IF v_batch_id IS NOT NULL THEN
+        INSERT INTO Transaksi_Stok (
+            tanggal, jenis_transaksi, jumlah, referensi, keterangan, batch_id, lokasi_id
+        )
+        VALUES (
+            NOW(), 'Stok Keluar', -NEW.jumlah, CONCAT('RESEP-', NEW.resep_id), 'Pemotongan otomatis FEFO via Resep', v_batch_id, v_lokasi_id
+        );
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'VALIDASI GAGAL: Stok obat tidak mencukupi di batch mana pun untuk melayani resep ini!';
+    END IF;
 END $$
 DELIMITER ;
 
--- TRIGGER 6: Validasi Stok Obat Tidak Boleh Negatif (Validasi Data)
--- Skenario: Menahan Transaksi_Stok jika pemotongan membuat saldo stok minus
+-- 6. TRIGGER: Validasi Stok Obat Tidak Boleh Negatif
 DELIMITER $$
-
 CREATE TRIGGER trg_validasi_stok_negatif
 BEFORE INSERT ON Transaksi_Stok
 FOR EACH ROW
@@ -147,7 +172,7 @@ BEGIN
         FROM Transaksi_Stok
         WHERE batch_id = NEW.batch_id AND lokasi_id = NEW.lokasi_id;
 
-        -- Jika saldo sekarang ditambah jumlah potong (minus) hasilnya di bawah 0, tolak!
+        -- Jika saldo sekarang ditambah jumlah potong (minus) hasilnya di bawah 0, tolak
         IF (v_stok_saat_ini + NEW.jumlah) < 0 THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'VALIDASI GAGAL: Transaksi ditolak karena akan menyebabkan stok obat menjadi negatif (minus).';
@@ -156,18 +181,16 @@ BEGIN
 END $$
 DELIMITER ;
 
--- BAGIAN TESTING (Untuk Pembuktian di Depan Dosen)
+-- BAGIAN TESTING
 
 -- 1. Test Trigger 1 (Auto RM)
 INSERT INTO Pasien (nama, tgl_lahir) VALUES ('Budi Trigger', '1995-10-10');
 SELECT patient_id, nama, nomor_rm FROM Pasien ORDER BY patient_id DESC LIMIT 1;
 
 -- 2. Test Trigger 4 (Audit Trail Logging)
--- (Catatan: Pastikan record_id = 1 ada datanya)
 UPDATE Rekam_Medis SET catatan_klinis = 'Tipes (Revisi Diagnosa oleh Dokter Budi)' WHERE record_id = 1;
 SELECT * FROM Log_Audit_Sistem;
 
 -- 3. Test Trigger 5 & 6 (Dispensing & Stok Negatif)
--- Trigger 5 akan otomatis jalan karena Stored Procedure sp_tambah_detail_resep melakukan INSERT
 CALL sp_tambah_detail_resep(1, 1, 5);
 SELECT * FROM Transaksi_Stok ORDER BY tanggal DESC LIMIT 3;
