@@ -2,7 +2,6 @@ use praktik_mandiri;
 
 -- transaksi kunjungan pasien baru
 DELIMITER $$
-
 CREATE PROCEDURE sp_tambah_kunjungan
 (
     IN p_layanan VARCHAR(50),
@@ -60,31 +59,13 @@ BEGIN
 
         -- Insert data ke tabel Kunjungan
         INSERT INTO Kunjungan
-        (
-            tgl_kunjungan,   
-            waktu_datang,    
-            jenis_layanan,
-            patient_id,
-            doctor_id,
-            antrian_no,
-            status
-        )
+        (tgl_kunjungan, waktu_datang, jenis_layanan, patient_id, doctor_id, antrian_no, status)
         VALUES
-        (
-            CURDATE(),       
-            NOW(),           
-            p_layanan,
-            p_pasien,
-            p_dokter,
-            v_antrian,       
-            'Terdaftar'
-        );
+        (CURDATE(), NOW(), p_layanan, p_pasien, p_dokter, v_antrian, 'Terdaftar');
         
     COMMIT;
 END $$
-
 DELIMITER ;
-
 DELIMITER $$
 
 CREATE PROCEDURE sp_buat_rekam_medis
