@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Obat - Dokter Mandiri</title>
+    <link rel="stylesheet" href="Assets/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Dokter Mandiri</div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="pasien.html">Manajemen Pasien</a></li>
+                <li><a href="kunjungan.html">Jadwal / Kunjungan</a></li>
+                <li><a href="rekam_medis.html">Rekam Medis</a></li>
+                <li><a href="resep.html">Resep & Dispensing</a></li>
+                <li><a href="obat.html" class="active">Obat & Stok</a></li>
+                <li><a href="tagihan.html">Tagihan</a></li>
+                <li><a href="laporan.html">Laporan</a></li>
+                <li><a href="users.html">User Management</a></li>
+                <li><a href="utility.html">Backup & Restore</a></li>
+                <li><a href="#" onclick="logout(); return false;">Logout</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <div>Halo, <strong id="userDisplay"> </strong></div>
+            </header>
+
+            <main class="content-area">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Data Obat</h2>
+                        <button class="btn btn-small" id="btnAdd">+ Tambah Obat Baru</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Obat</th>
+                                <th>Bentuk</th>
+                                <th>Satuan</th>
+                                <th>Kategori</th>
+                                <th>Detail Obat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Paracetamol</td>
+                                <td>Tablet</td>
+                                <td>Strip</td>
+                                <td>Analgesik</td>
+                                <td>
+                                    <a href="detail_obat.html" class="btn btn-small">Lihat Detail</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 style="margin-bottom: 1rem;">Data Obat Baru</h2>
+            <form>
+                <div class="form-group">
+                    <label>Nama Obat</label>
+                    <input type="text" class="form-control" placeholder="Masukkan nama obat..." required>
+                </div>
+                <div class="form-group">
+                    <label>Bentuk</label>
+                    <input type="text" class="form-control" placeholder="Misal: Tablet, Kapsul,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Satuan</label>
+                    <input type="text" class="form-control" placeholder="Misal: Strip, Botol,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <input type="text" class="form-control" placeholder="Misal: Analgesik, Antibiotik,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Dosis</label>
+                    <input type="text" class="form-control" placeholder="Misal: x mg, x ml,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Rute</label>
+                    <input type="text" class="form-control" placeholder="Misal: Oral, Intravena,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Frekuensi</label>
+                    <input type="text" class="form-control" placeholder="Misal: 3x sehari, 1x minggu,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Durasi</label>
+                    <input type="text" class="form-control" placeholder="Misal: 5 hari, 7 hari,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah</label>
+                    <input type="text" class="form-control" placeholder="Misal: 15, 30,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Instruksi</label>
+                    <input type="text" class="form-control" placeholder="Misal: Bila demam saja" required>
+                </div>
+
+                <button type="submit" class="btn">Simpan Data Obat Baru</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="formModal2" class="modal2">
+        <div class="modal2-content">
+            <span class="close-modal2">&times;</span>
+            <h2 style="margin-bottom: 1rem;">Data Obat Baru</h2>
+            <form>
+                <div class="form-group">
+                    <label>Nama Obat</label>
+                    <input type="text" class="form-control" placeholder="Masukkan nama obat..." required>
+                </div>
+                <div class="form-group">
+                    <label>Bentuk</label>
+                    <input type="text" class="form-control" placeholder="Misal: Tablet, Kapsul,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Satuan</label>
+                    <input type="text" class="form-control" placeholder="Misal: Strip, Botol,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <input type="text" class="form-control" placeholder="Misal: Analgesik, Antibiotik,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Dosis</label>
+                    <input type="text" class="form-control" placeholder="Misal: x mg, x ml,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Rute</label>
+                    <input type="text" class="form-control" placeholder="Misal: Oral, Intravena,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Frekuensi</label>
+                    <input type="text" class="form-control" placeholder="Misal: 3x sehari, 1x minggu,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Durasi</label>
+                    <input type="text" class="form-control" placeholder="Misal: 5 hari, 7 hari,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah</label>
+                    <input type="text" class="form-control" placeholder="Misal: 15, 30,..." required>
+                </div>
+                <div class="form-group">
+                    <label>Instruksi</label>
+                    <input type="text" class="form-control" placeholder="Misal: Bila demam saja" required>
+                </div>
+
+                <button type="submit" class="btn">Simpan Data Obat Baru</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setupUserSession();
+        });
+
+        function setupUserSession() {
+            const userDisplay = document.getElementById("userDisplay");
+            const userLogin = localStorage.getItem("userLogin");
+            
+            if (!userLogin) {
+                localStorage.setItem("userLogin", "Pengguna");
+                if (userDisplay) userDisplay.textContent = "Pengguna";
+            } else {
+                if (userDisplay) userDisplay.textContent = userLogin;
+            }
+        }
+
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin logout?")) {
+                localStorage.removeItem("userLogin");
+                showNotification("Logout berhasil", "success");
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1000);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement("div");
+            notification.textContent = message;
+            let bgColor = "#27ae60";
+            if (type === "error") bgColor = "#dc3545";
+            if (type === "info") bgColor = "#3498db";
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 4px;
+                z-index: 10000;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+    </script>
+    <script src="Assets/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Utility Database - Dokter Mandiri</title>
+    <link rel="stylesheet" href="Assets/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Dokter Mandiri</div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="pasien.html">Manajemen Pasien</a></li>
+                <li><a href="kunjungan.html">Jadwal / Kunjungan</a></li>
+                <li><a href="rekam_medis.html">Rekam Medis</a></li>
+                <li><a href="resep.html">Resep & Dispensing</a></li>
+                <li><a href="obat.html">Obat & Stok</a></li>
+                <li><a href="tagihan.html">Tagihan</a></li>
+                <li><a href="laporan.html">Laporan</a></li>
+                <li><a href="users.html">User Management</a></li>
+                <li><a href="utility.html" class="active">Backup & Restore</a></li>
+                <li><a href="#" onclick="logout(); return false;">Logout</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <div>Halo, <strong id="userDisplay">Pengguna</strong> <span style="font-size: 0.8rem; color: #7f8c8d;">(Admin)</span></div>
+            </header>
+
+            <main class="content-area">
+                <h2>Utility System (Maintenance Database)</h2>
+                <p style="color: #7f8c8d; margin-bottom: 20px;">Fasilitas wajib untuk mengamankan data rekam medis dan memulihkannya saat terjadi keadaan darurat.</p>
+
+                <div id="alertContainer"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    
+                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center;">
+                        <h3 style="margin-bottom: 10px; color: #2c3e50;">Backup Database</h3>
+                        <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 20px;">Unduh seluruh struktur tabel dan data aplikasi Dokter Mandiri ke dalam file berekstensi .sql.</p>
+                        <form id="backupForm" onsubmit="handleBackup(event)">
+                            <button type="submit" class="btn" style="background-color: #27ae60; width: auto; padding: 10px 30px; border: none; color: white; border-radius: 4px; cursor: pointer;">
+                                📥 Mulai Ekspor (.SQL)
+                            </button>
+                        </form>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <h3 style="margin-bottom: 10px; color: #2c3e50; text-align: center;">Restore Database</h3>
+                        <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 20px; text-align: center;">Pilih file backup .sql dari komputer Anda untuk menimpa/mengembalikan data sistem saat ini.</p>
+                        <form id="restoreForm" onsubmit="handleRestore(event)">
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label for="file_sql" style="display: block; margin-bottom: 5px;">Pilih File Backup (.sql)</label>
+                                <input type="file" id="file_sql" name="file_sql" accept=".sql" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <button type="submit" class="btn" style="background-color: #e74c3c; width: 100%; padding: 10px; border: none; color: white; border-radius: 4px; cursor: pointer;">
+                                📤 Mulai Impor (.SQL)
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="Assets/main.js"></script>
+    <script>
+        // Menangani pengecekan parameter URL untuk menampilkan alert secara dinamis (Pengganti logic $_GET PHP)
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const msg = urlParams.get('msg');
+            const alertContainer = document.getElementById('alertContainer');
+
+            if (status) {
+                let alertBox = document.createElement('div');
+                alertBox.style.cssText = "padding: 12px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px;";
+
+                if (status === 'backup_success') {
+                    alertBox.style.backgroundColor = "#d4edda";
+                    alertBox.style.color = "#155724";
+                    alertBox.style.borderColor = "#c3e6cb";
+                    alertBox.style.textContent = "Database berhasil dicadangkan! File .sql otomatis terunduh.";
+                    alertBox.innerText = "Database berhasil dicadangkan! File .sql otomatis terunduh.";
+                } else if (status === 'restore_success') {
+                    alertBox.style.backgroundColor = "#d4edda";
+                    alertBox.style.color = "#155724";
+                    alertBox.style.borderColor = "#c3e6cb";
+                    alertBox.innerText = "Database berhasil dipulihkan (Restore) ke kondisi file cadangan!";
+                } else if (status === 'error') {
+                    alertBox.style.backgroundColor = "#f8d7da";
+                    alertBox.style.color = "#721c24";
+                    alertBox.style.borderColor = "#f5c6cb";
+                    alertBox.innerText = "Gagal memproses tindakan: " + (msg ? decodeURIComponent(msg) : "Terjadi kesalahan internal.");
+                }
+                alertContainer.appendChild(alertBox);
+            }
+        });
+
+        // Simulasi Aksi Form Backup saat tahap Prototyping Frontend
+        function handleBackup(event) {
+            event.preventDefault();
+            // Menstimulasi respons sukses dengan redirect ke parameter status
+            window.location.href = "utility.html?status=backup_success";
+        }
+
+        // Simulasi Aksi Form Restore saat tahap Prototyping Frontend
+        function handleRestore(event) {
+            event.preventDefault();
+            if (confirm('Peringatan! Proses restore akan menimpa data yang ada saat ini. Apakah Anda yakin?')) {
+                // Menstimulasi respons sukses dengan redirect ke parameter status
+                window.location.href = "utility.html?status=restore_success";
+            }
+        }
+
+        // Fungsi logout disesuaikan dengan manajemen localStorage front-end Anda
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin logout?")) {
+                localStorage.removeItem("userLogin");
+                if (typeof showNotification === "function") {
+                    showNotification("Logout berhasil", "success");
+                    setTimeout(() => { window.location.href = "login.html"; }, 1000);
+                } else {
+                    window.location.href = "login.html";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

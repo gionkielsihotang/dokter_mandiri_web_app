@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Dokter Mandiri</title>
+    <link rel="stylesheet" href="Assets/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Dokter Mandiri</div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="pasien.html">Manajemen Pasien</a></li>
+                <li><a href="kunjungan.html">Jadwal / Kunjungan</a></li>
+                <li><a href="rekam_medis.html">Rekam Medis</a></li>
+                <li><a href="resep.html">Resep & Dispensing</a></li>
+                <li><a href="obat.html">Obat & Stok</a></li>
+                <li><a href="tagihan.html">Tagihan</a></li>
+                <li><a href="laporan.html">Laporan</a></li>
+                <li><a href="users.html">User Management</a></li>
+                <li><a href="utility.html">Backup & Restore</a></li>
+                <li><a href="#" onclick="logout(); return false;">Logout</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <div>Halo, <strong id="userDisplay"> </strong></div>
+                
+            </header>
+
+            <main class="content-area">
+                <h2>Summary</h2>
+                <br>
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <h3>Total Pasien</h3>
+                        <p>10</p>
+                    </div>
+                    <div class="card">
+                        <h3>Tagihan Belum Selesai</h3>
+                        <p>7</p>
+                    </div>
+                    <div class="card">
+                        <h3>Pre Order Obat</h3>
+                        <p>10</p>
+                    </div>
+                    <div class="card">
+                        <h3>Pendapatan Bulan Ini</h3>
+                        <p>Rp 10.000k</p>
+                    </div>
+                </div>
+
+                <div class="table-container" style="margin-top: 2rem;">
+                    <h3>Daftar Kunjungan Hari Ini</h3>
+                    <br>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Pasien</th>
+                                <th>Nama Pasien</th>
+                                <th>Waktu</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Budi Santoso</td>
+                                <td>09:00 WIB</td>
+                                <td>Selesai Diperiksa</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Dewi Lestari</td>
+                                <td>09:30 WIB</td>
+                                <td>Menunggu Obat</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Setup session & user display
+        document.addEventListener("DOMContentLoaded", function() {
+            setupUserSession();
+        });
+
+        function setupUserSession() {
+            const userDisplay = document.getElementById("userDisplay");
+            const userLogin = localStorage.getItem("userLogin");
+            
+            if (!userLogin) {
+                // Set default user untuk testing
+                localStorage.setItem("userLogin", "Pengguna");
+                if (userDisplay) userDisplay.textContent = "Pengguna";
+            } else {
+                if (userDisplay) userDisplay.textContent = userLogin;
+            }
+        }
+
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin logout?")) {
+                localStorage.removeItem("userLogin");
+                showNotification("Logout berhasil", "success");
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1000);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement("div");
+            notification.textContent = message;
+            let bgColor = "#27ae60";
+            if (type === "error") bgColor = "#dc3545";
+            if (type === "info") bgColor = "#3498db";
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 4px;
+                z-index: 10000;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+    </script>
+    <script src="Assets/main.js"></script>
+</body>
+</html>

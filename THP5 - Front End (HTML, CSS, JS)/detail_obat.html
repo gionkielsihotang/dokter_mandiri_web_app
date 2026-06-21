@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail Obat - Dokter Mandiri</title>
+    <link rel="stylesheet" href="Assets/style.css">
+</head>
+<body>
+        <div class="main-content">
+            <header class="topbar">
+                <div>Halo, <strong id="userDisplay">dr. Budi</strong></div>
+                <a href="obat.html" class="btn btn-small btn-danger">Back</a>
+            </header>
+
+            <main class="content-area">
+                <div class="dashboard-cards">
+                    <div class="table-container">
+                        <h3>Detail Obat</h3><br>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama Obat</th>
+                                    <th>Bentuk</th>
+                                    <th>Satuan</th>
+                                    <th>Kategori</th>
+                                    <th>Dosis</th>
+                                    <th>Rute</th>
+                                    <th>Frekuensi</th>
+                                    <th>Durasi</th>
+                                    <th>Jumlah</th>
+                                    <th>Instruksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Paracetamol</td>
+                                    <td>Tablet</td>
+                                    <td>Strip</td>
+                                    <td>Analgesik</td>
+                                    <td>500mg</td>
+                                    <td>Oral</td>
+                                    <td>3x sehari</td>
+                                    <td>5 hari</td>
+                                    <td>15 tablet</td>
+                                    <td>Minum setelah makan</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setupUserSession();
+        });
+
+        function setupUserSession() {
+            const userDisplay = document.getElementById("userDisplay");
+            const userLogin = localStorage.getItem("userLogin");
+            
+            if (!userLogin) {
+                localStorage.setItem("userLogin", "Pengguna");
+                if (userDisplay) userDisplay.textContent = "Pengguna";
+            } else {
+                if (userDisplay) userDisplay.textContent = userLogin;
+            }
+        }
+
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin logout?")) {
+                localStorage.removeItem("userLogin");
+                showNotification("Logout berhasil", "success");
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1000);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement("div");
+            notification.textContent = message;
+            let bgColor = "#27ae60";
+            if (type === "error") bgColor = "#dc3545";
+            if (type === "info") bgColor = "#3498db";
+            
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; padding: 12px 20px;
+                background-color: ${bgColor}; color: white; border-radius: 4px; z-index: 10000;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+    </script>
+    <script src="Assets/main.js"></script>
+</body>
+</html>

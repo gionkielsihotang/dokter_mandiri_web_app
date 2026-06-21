@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Rekam Medis - Dokter Mandiri</title>
+    <link rel="stylesheet" href="Assets/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Dokter Mandiri</div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="pasien.html">Manajemen Pasien</a></li>
+                <li><a href="kunjungan.html">Jadwal / Kunjungan</a></li>
+                <li><a href="rekam_medis.html" class="active">Rekam Medis</a></li>
+                <li><a href="resep.html">Resep & Dispensing</a></li>
+                <li><a href="obat.html">Obat & Stok</a></li>
+                <li><a href="tagihan.html">Tagihan</a></li>
+                <li><a href="laporan.html">Laporan</a></li>
+                <li><a href="users.html">User Management</a></li>
+                <li><a href="utility.html">Backup & Restore</a></li>
+                <li><a href="#" onclick="logout(); return false;">Logout</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <div>Halo, <strong id="userDisplay"> </strong></div>
+            </header>
+
+            <main class="content-area">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Pemeriksaan & Rekam Medis</h2>
+                        <button class="btn btn-small" id="btnAdd">Pilih Pasien</button>
+                    </div><table>
+                            <thead>
+                                <tr>
+                                    <th>ID Pasien</th>
+                                    <th>Nama Pasien</th>
+                                    <th>Tanggal</th>
+                                    <th>Vital Summary</th>
+                                    <th>Tinggi Badan</th>
+                                    <th>Berat Badan</th>
+                                    <th>Anamnesa</th>
+                                    <th>Pemeriksaan</th>
+                                    <th>Catatan</th>
+                                    <th>Riwayat Obat</th>
+                                    <th>Riwayat Penyakit</th>
+                                    <th>Alergi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Budi Santoso</td>
+                                    <td>2023-10-25</td>
+                                    <td>TD: 120/80, N: 80, S: 36.5</td>
+                                    <td>170 cm</td>
+                                    <td>65 kg</td>
+                                    <td>Pasien datang dengan keluhan sakit kepala dan mual.</td>
+                                    <td>Pemeriksaan fisik dilakukan, tekanan darah normal.</td>
+                                    <td>Perlu istirahat cukup dan minum obat sesuai anjuran.</td>
+                                    <td>Paracetamol 500mg, 3x sehari</td>
+                                    <td>Hipertensi, Diabetes Melitus</td>
+                                    <td>Sensitif terhadap sulfonamida</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 style="margin-bottom: 1rem;">Isi Rekam Medis</h2>
+            <form>
+                <div class="form-group">
+                    <label>Cari Pasien (ID Pasien / Nama)</label>
+                    <input type="text" class="form-control" placeholder="Masukkan ID Pasien..." required>
+                </div>
+                
+                <h2 style="margin-bottom: 1rem;">Vital Summary</h2>
+                <div class="form-group">
+                    <label>Tekanan Darah</label>
+                    <input type="text" class="form-control" placeholder="Contoh: 120/80" required>
+                </div>
+                <div class="form-group">
+                    <label>Nadi</label>
+                    <input type="text" class="form-control" placeholder="BPM" required>
+                </div>
+                <div class="form-group">
+                    <label>Suhu</label>
+                    <input type="text" class="form-control" placeholder="°C" required>
+                </div>
+                <div class="form-group">
+                    <label>Tinggi Badan</label>
+                    <input type="text" class="form-control" placeholder="cm" required>
+                </div>
+                <div class="form-group">
+                    <label>Berat Badan</label>
+                    <input type="text" class="form-control" placeholder="kg" required>
+                </div>
+
+                <h2 style="margin-bottom: 1rem;">Keterangan</h2>
+                <div class="form-group">
+                    <label>Anamnesa</label>
+                    <textarea class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Pemeriksaan</label>
+                    <textarea class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Catatan</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Riwayat Obat</label>
+                    <input type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Riwayat Penyakit</label>
+                    <input type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Alergi</label>
+                    <input type="text" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn">Simpan Rekam Medis</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setupUserSession();
+        });
+
+        function setupUserSession() {
+            const userDisplay = document.getElementById("userDisplay");
+            const userLogin = localStorage.getItem("userLogin");
+            
+            if (!userLogin) {
+                localStorage.setItem("userLogin", "Pengguna");
+                if (userDisplay) userDisplay.textContent = "Pengguna";
+            } else {
+                if (userDisplay) userDisplay.textContent = userLogin;
+            }
+        }
+
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin logout?")) {
+                localStorage.removeItem("userLogin");
+                showNotification("Logout berhasil", "success");
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1000);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement("div");
+            notification.textContent = message;
+            let bgColor = "#27ae60";
+            if (type === "error") bgColor = "#dc3545";
+            if (type === "info") bgColor = "#3498db";
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 4px;
+                z-index: 10000;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+    </script>
+    <script src="Assets/main.js"></script>
+</body>
+</html>
