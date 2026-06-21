@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Jadwal Kunjungan - Dokter Mandiri</title>
+    <link rel="stylesheet" href="Assets/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Dokter Mandiri</div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="pasien.html">Manajemen Pasien</a></li>
+                <li><a href="kunjungan.html" class="active">Jadwal / Kunjungan</a></li>
+                <li><a href="rekam_medis.html">Rekam Medis</a></li>
+                <li><a href="resep.html">Resep & Dispensing</a></li>
+                <li><a href="obat.html">Obat & Stok</a></li>
+                <li><a href="tagihan.html">Tagihan</a></li>
+                <li><a href="laporan.html">Laporan</a></li>
+                <li><a href="users.html">User Management</a></li>
+                <li><a href="logout.html" onclick="logout()">Logout</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <div>Halo, <strong id="userDisplay"> </strong></div>
+            </header>
+
+            <main class="content-area">
+                <div class="table-container patient-scroll-box ">
+                    <div class="table-header">
+                        <h2>Daftar Kunjungan Hari Ini</h2>
+                        <button class="btn btn-small" id="btnAdd">+ Pasien Datang</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Antrean</th>
+                                <th>Nama Pasien</th>
+                                <th>Tanggal</th>
+                                <th>Waktu Datang</th>
+                                <th>Waktu Selesai</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>A-01</td>
+                                <td>Budi Santoso</td>
+                                <td>2023-10-01</td>
+                                <td>09:00 WIB</td>
+                                <td>09:30 WIB</td>
+                                <td><span style="color: #27ae60; font-weight: bold;">Selesai Diperiksa</span></td>
+                                <td>
+                                    <button class="btn btn-small" style="background-color: #27ae60; color: white;">Selesai</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        
+                        <tbody>
+                            <tr>
+                                <td>A-02</td>
+                                <td>Dewi Lestari</td>
+                                <td>2023-10-01</td>
+                                <td>09:00 WIB</td>
+                                <td>-</td>
+                                <td><span style="color: #e67e22; font-weight: bold;">Menunggu Dokter</span></td>
+                                <td>
+                                    <button class="btn btn-small">Selesai</button>
+                                    <button class="btn btn-small btn-danger">Batal</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 style="margin-bottom: 1rem;">Registrasi Kunjungan</h2>
+            <form>
+                <div class="form-group">
+                    <label>Cari Pasien (ID Pasien / Nama)</label>
+                    <input type="text" class="form-control" placeholder="Masukkan ID Pasien..." required>
+                </div>
+                <div class="form-group">
+                    <label>Keluhan Pasien</label>
+                    <textarea class="form-control" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn">Daftarkan Antrean</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setupUserSession();
+        });
+
+        function setupUserSession() {
+            const userDisplay = document.getElementById("userDisplay");
+            const userLogin = localStorage.getItem("userLogin");
+            
+            if (!userLogin) {
+                localStorage.setItem("userLogin", "Pengguna");
+                if (userDisplay) userDisplay.textContent = "Pengguna";
+            } else {
+                if (userDisplay) userDisplay.textContent = userLogin;
+            }
+        }
+
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin logout?")) {
+                localStorage.removeItem("userLogin");
+                showNotification("Logout berhasil", "success");
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1000);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement("div");
+            notification.textContent = message;
+            let bgColor = "#27ae60";
+            if (type === "error") bgColor = "#dc3545";
+            if (type === "info") bgColor = "#3498db";
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 4px;
+                z-index: 10000;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+    </script>
+    <script src="Assets/main.js"></script>
+</body>
+</html>

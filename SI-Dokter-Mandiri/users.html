@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Manajemen User - Dokter Mandiri</title>
+    <link rel="stylesheet" href="Assets/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Dokter Mandiri</div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="pasien.html">Manajemen Pasien</a></li>
+                <li><a href="kunjungan.html">Jadwal / Kunjungan</a></li>
+                <li><a href="rekam_medis.html">Rekam Medis</a></li>
+                <li><a href="resep.html">Resep & Dispensing</a></li>
+                <li><a href="obat.html">Obat & Stok</a></li>
+                <li><a href="tagihan.html">Tagihan</a></li>
+                <li><a href="laporan.html">Laporan</a></li>
+                <li><a href="users.html" class="active">User Management</a></li>
+                <li><a href="logout.html" onclick="logout()">Logout</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <div>Halo, <strong id="userDisplay"> </strong></div>
+            </header>
+
+            <main class="content-area">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Daftar User</h2>
+                        <button class="btn btn-small" id="btnAdd">+ Tambah User</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Lengkap</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Kontak</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>dr. Budi Santoso</td>
+                                <td>drbudi</td>
+                                <td>Dokter Spesialis</td>
+                                <td>081234567890</td>
+                                <td>
+                                    <button class="btn btn-small">Reset Password</button>
+                                    <button class="btn btn-small btn-danger">Nonaktifkan</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Siti Aminah</td>
+                                <td>kasir_siti</td>
+                                <td>Kasir / Pendaftaran</td>
+                                <td>081234567891</td>
+                                <td>
+                                    <button class="btn btn-small">Reset Password</button>
+                                    <button class="btn btn-small btn-danger">Nonaktifkan</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 style="margin-bottom: 1rem;">Tambah User Baru</h2>
+            <form>
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Kontak</label>
+                    <input type="text" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Role</label>
+                    <select class="form-control">
+                        <option>Admin</option>
+                        <option>Dokter Spesialis</option>
+                        <option>Perawat</option>
+                        <option>Apoteker</option>
+                        <option>Kasir</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn">Simpan User</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setupUserSession();
+        });
+
+        function setupUserSession() {
+            const userDisplay = document.getElementById("userDisplay");
+            const userLogin = localStorage.getItem("userLogin");
+            
+            if (!userLogin) {
+                localStorage.setItem("userLogin", "Pengguna");
+                if (userDisplay) userDisplay.textContent = "Pengguna";
+            } else {
+                if (userDisplay) userDisplay.textContent = userLogin;
+            }
+        }
+
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin logout?")) {
+                localStorage.removeItem("userLogin");
+                showNotification("Logout berhasil", "success");
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1000);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement("div");
+            notification.textContent = message;
+            let bgColor = "#27ae60";
+            if (type === "error") bgColor = "#dc3545";
+            if (type === "info") bgColor = "#3498db";
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 4px;
+                z-index: 10000;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+    </script>
+    <script src="Assets/main.js"></script>
+</body>
+</html>
