@@ -1,6 +1,6 @@
-# PROJECT SISTEM INFORMASI PRAKTIK DOKTER MANDIRI - MEDCARE
+# Sistem Informasi Praktik Dokter Mandiri
 
-Website Sistem Informasi lengkap untuk manajemen pasien, rekam medis, obat, dan keuangan klinik. Dikembangkan sebagai pemenuhan tugas akhir mata kuliah Pemrograman SQL.
+Sistem informasi berbasis web yang dikembangkan untuk membantu pengelolaan layanan kesehatan pada praktik dokter mandiri. Fitur utama meliputi manajemen pasien, rekam medis, resep dan stok obat, penjadwalan kunjungan, transaksi pembayaran, serta penyusunan laporan. Proyek ini dibuat sebagai implementasi dan penerapan konsep basis data relasional serta pemrograman SQL dalam lingkungan yang menyerupai kebutuhan dunia nyata.
 
 ---
 
