@@ -66,6 +66,8 @@ BEGIN
     COMMIT;
 END $$
 DELIMITER ;
+
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_buat_rekam_medis
