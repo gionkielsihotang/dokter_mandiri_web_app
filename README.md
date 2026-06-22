@@ -61,8 +61,8 @@ Struktur database dibagi menjadi beberapa tahap mengikuti ketentuan penugasan:
 2. Buka file konfigurasi koneksi database PHP Anda (misal `config.php` atau `database.php`), kemudian sesuaikan kredensialnya:
    ```php
    $host = "localhost";
-   $user = "root"; (sesuaikan dengan isi database phpMyAdmin anda)
-   $password = ""; (sesuaikan dengan isi database phpMyAdmin anda)
+   $user = "root"; (sesuaikan dengan phpMyAdmin anda)
+   $password = ""; (sesuaikan dengan phpMyAdmin anda)
    $database = "praktik_mandiri";
 
 
