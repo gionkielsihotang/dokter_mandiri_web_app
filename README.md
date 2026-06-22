@@ -53,21 +53,21 @@ Struktur database dibagi menjadi beberapa tahap mengikuti ketentuan penugasan:
 ### 5.1 Persiapan Database (XAMPP)
 1. Buka **XAMPP Control Panel** dan aktifkan modul **Apache** serta **MySQL**.
 2. Buka browser dan akses **phpMyAdmin** melalui alamat: `http://localhost/phpmyadmin/`.
-3. Buat database baru bernama `db_dokter_mandiri`.
-4. Pilih database tersebut, lalu masuk ke menu **Import** untuk memasukkan file-file `.sql` Anda secara berurutan sesuai tahap pengerjaan.
+3. Buat database baru bernama `praktik_mandiri`.
+4. Pilih database tersebut, lalu masuk ke menu **Import** untuk memasukkan file-file `.sql` secara berurutan sesuai tahap pengerjaan.
 
 ### 5.2 Konfigurasi File Aplikasi
-1. Pindahkan folder proyek aplikasi Anda ke dalam direktori root XAMPP di `C:\xampp\htdocs\`. (Pastikan nama foldernya mudah diakses, misal: `htdocs/medcare`).
+1. Pindahkan folder proyek aplikasi (klinik-mandiri) ke dalam direktori root XAMPP di `C:\xampp\htdocs\`. (Pastikan nama foldernya mudah diakses, misal: `htdocs/klinik-mandiri`).
 2. Buka file konfigurasi koneksi database PHP Anda (misal `config.php` atau `database.php`), kemudian sesuaikan kredensialnya:
    ```php
    $host = "localhost";
-   $user = "root";
-   $password = "";
-   $database = "db_dokter_mandiri";
+   $user = "root"; (sesuaikan dengan isi database phpMyAdmin anda)
+   $password = ""; (sesuaikan dengan isi database phpMyAdmin anda)
+   $database = "praktik_mandiri";
 
 
 ### 5.3 Mengakses Website
-1. Buka browser dan ketik alamat URL lokal sesuai nama folder Anda, contoh: http://localhost/medcare/
+1. Buka browser dan ketik alamat URL lokal sesuai nama folder Anda, contoh: http://localhost/klinik-mandiri/
 2. Sistem akan otomatis mengarahkan Anda ke halaman Login.
 3. Login dengan menggunakan salah satu dari daftar username dan password berikut:
 | user_id | nama            | username      | password             |
